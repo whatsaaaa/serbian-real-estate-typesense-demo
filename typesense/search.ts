@@ -1,5 +1,5 @@
 import { Client, Errors } from 'typesense'
-import type { SearchParams } from 'typesense'
+import type { SearchParams, SearchResponse } from 'typesense'
 import type { Listing } from '../shared/listing.ts'
 import type { SearchResult, Understood } from '../shared/search.ts'
 import { collectionName, queryBy } from './collection.ts'
@@ -32,10 +32,10 @@ export class NotUnderstoodError extends Error {
 /** Typesense cannot run the parameters the natural language search generated. */
 export class UnrunnableParamsError extends Error {
   override name = 'UnrunnableParamsError'
-  /** What the search understood, when Typesense answered with it. */
-  readonly understood: Understood | undefined
+  /** What the search understood. */
+  readonly understood: Understood
 
-  constructor(understood: Understood | undefined, message: string) {
+  constructor(understood: Understood, message: string) {
     super(message)
     this.understood = understood
   }
@@ -44,34 +44,47 @@ export class UnrunnableParamsError extends Error {
 /**
  * Asks Typesense's natural language search what a query means: Typesense sends it to the LLM
  * with the system prompt and the schema, and answers with the parameters the LLM generated.
+ *
+ * It is sent as a multi search: when Typesense cannot run the generated parameters, a multi search
+ * still answers with them next to the reason, where the client keeps only the reason of a search.
  */
 async function understand(
   client: Client,
   query: string,
 ): Promise<{ understood: Understood; parseTimeMs: number }> {
-  const response = await client.collections<Listing>(collectionName).documents().search({
-    q: query,
-    query_by: queryBy,
-    nl_query: true,
-    nl_model_id: nlModelId,
-    // Only the parameters are wanted from this request: search() runs them
-    per_page: 0,
+  const {
+    results: [response],
+  } = await client.multiSearch.perform<[Listing]>({
+    searches: [
+      {
+        collection: collectionName,
+        q: query,
+        query_by: queryBy,
+        nl_query: true,
+        nl_model_id: nlModelId,
+        // Only the parameters are wanted from this request: search() runs them
+        per_page: 0,
+      },
+    ],
   })
-  const parsed = response.parsed_nl_query
+  if (response.code === 404) throw new Errors.ObjectNotFound(response.error)
   // On a failure Typesense still searches, for the query as text, and says why in
   // `parsed_nl_query.error`
-  const error = (parsed as { error?: string } | undefined)?.error
+  const parsed = response.parsed_nl_query as
+    | (NonNullable<SearchResponse<Listing>['parsed_nl_query']> & { error?: string })
+    | undefined
+  const error = parsed?.error
   if (error || !parsed) throw new NotUnderstoodError(error ?? 'Typesense returned no parameters')
 
   const generated = parsed.generated_params
-  return {
-    understood: {
-      q: String(generated.q || '*'),
-      filter_by: String(generated.filter_by ?? ''),
-      sort_by: String(generated.sort_by ?? ''),
-    },
-    parseTimeMs: parsed.parse_time_ms,
+  const understood = {
+    q: String(generated.q || '*'),
+    filter_by: String(generated.filter_by ?? ''),
+    sort_by: String(generated.sort_by ?? ''),
   }
+  // The LLM wrote a filter or a sort that is not valid, such as one on a field there is not
+  if (response.error) throw new UnrunnableParamsError(understood, response.error)
+  return { understood, parseTimeMs: parsed.parse_time_ms }
 }
 
 const perPage = 250
@@ -111,21 +124,11 @@ export async function searchListings(client: Client, query: string): Promise<Sea
   if (!trimmed)
     return { understood: null, parseTimeMs: null, ...(await fetchAll(client, { q: '*' })) }
 
-  let understood: Understood | undefined
-  try {
-    const parsed = await understand(client, trimmed)
-    understood = parsed.understood
-    const results = await fetchAll(client, {
-      q: understood.q,
-      filter_by: understood.filter_by,
-      sort_by: understood.sort_by,
-    })
-    return { understood, parseTimeMs: parsed.parseTimeMs, ...results }
-  } catch (error) {
-    // The LLM wrote a filter or a sort that is not valid, such as one on a field there is not
-    if (error instanceof Errors.RequestMalformed) {
-      throw new UnrunnableParamsError(understood, error.message)
-    }
-    throw error
-  }
+  const { understood, parseTimeMs } = await understand(client, trimmed)
+  const results = await fetchAll(client, {
+    q: understood.q,
+    filter_by: understood.filter_by,
+    sort_by: understood.sort_by,
+  })
+  return { understood, parseTimeMs, ...results }
 }

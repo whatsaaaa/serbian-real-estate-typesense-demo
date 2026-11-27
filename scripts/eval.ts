@@ -35,7 +35,7 @@ const client = clientFromEnv()
 const code = (text: string) => (text ? `\`\` ${text.replaceAll('|', '\\|')} \`\`` : '')
 
 /** The parameters the search generated, on one line. */
-const describe = (understood: Understood | null | undefined) =>
+const describe = (understood: Understood | null) =>
   understood
     ? [understood.q === '*' ? '' : `q: ${understood.q}`, understood.filter_by]
         .concat(understood.sort_by ? [`sort_by: ${understood.sort_by}`] : [])
