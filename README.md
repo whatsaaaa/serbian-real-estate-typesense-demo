@@ -96,6 +96,7 @@ A district, such as Vračar, Zvezdara or Novi Beograd, matches every neighbourho
 | `pnpm dev`               | Starts the app on a local server                                     |
 | `pnpm seed`              | Creates the collection, imports the listings and registers the model |
 | `pnpm eval`              | Runs the test queries against the live search                        |
+| `pnpm test`              | Runs the unit tests                                                  |
 | `pnpm generate:listings` | Writes `data/listings.jsonl` again, the same every time              |
 | `pnpm build`             | Builds the app into `.output/`                                       |
 | `pnpm lint`              | Checks the code and the stylesheets, fixing what it can              |

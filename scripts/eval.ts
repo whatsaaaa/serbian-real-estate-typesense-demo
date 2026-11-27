@@ -11,7 +11,13 @@
  * match.
  */
 import { readFileSync } from 'node:fs'
-import { NotUnderstoodError, fetchAll, understand } from '../typesense/search.ts'
+import type { Understood } from '../shared/search.ts'
+import {
+  NotUnderstoodError,
+  UnrunnableParamsError,
+  fetchAll,
+  searchListings,
+} from '../typesense/search.ts'
 import { clientFromEnv } from './env.ts'
 
 interface TestQuery {
@@ -27,6 +33,15 @@ const client = clientFromEnv()
 
 // The filters hold backticks, so a code span opens with two, and a space keeps them apart
 const code = (text: string) => (text ? `\`\` ${text.replaceAll('|', '\\|')} \`\`` : '')
+
+/** The parameters the search generated, on one line. */
+const describe = (understood: Understood | null | undefined) =>
+  understood
+    ? [understood.q === '*' ? '' : `q: ${understood.q}`, understood.filter_by]
+        .concat(understood.sort_by ? [`sort_by: ${understood.sort_by}`] : [])
+        .filter(Boolean)
+        .join(' ; ')
+    : ''
 
 // The expected listings first, so a test that the data cannot meet fails before any LLM call
 const expectations = []
@@ -46,16 +61,8 @@ for (const { test, expected } of expectations) {
   let result: string
   let generated = ''
   try {
-    const { understood } = await understand(client, test.query)
-    generated = [understood.q === '*' ? '' : `q: ${understood.q}`, understood.filter_by]
-      .concat(understood.sort_by ? [`sort_by: ${understood.sort_by}`] : [])
-      .filter(Boolean)
-      .join(' ; ')
-    const actual = await fetchAll(client, {
-      q: understood.q,
-      filter_by: understood.filter_by,
-      sort_by: understood.sort_by,
-    })
+    const actual = await searchListings(client, test.query)
+    generated = describe(actual.understood)
     const ids = (listings: { id: string }[]) => listings.map((listing) => listing.id)
     const sameListings =
       ids(actual.listings).toSorted().join() === ids(expected.listings).toSorted().join()
@@ -69,10 +76,16 @@ for (const { test, expected } of expectations) {
       result = `${actual.found} found, ${expected.found} expected`
     }
   } catch (error) {
-    if (!(error instanceof NotUnderstoodError)) throw error
-    result = `not understood: ${error.message}`
+    if (error instanceof NotUnderstoodError) {
+      result = `not understood: ${error.message}`
+    } else if (error instanceof UnrunnableParamsError) {
+      generated = describe(error.understood)
+      result = `cannot run: ${error.message}`
+    } else {
+      throw error
+    }
   }
-  const line = `| ${test.query} | ${code(test.filter_by + (test.sort_by ? ` ; sort_by: ${test.sort_by}` : ''))} | ${code(generated)} | ${result} |`
+  const line = `| ${test.query} | ${code(test.filter_by + (test.sort_by ? ` ; sort_by: ${test.sort_by}` : ''))} | ${code(generated)} | ${result.replaceAll('|', '\\|')} |`
   rows.push(line)
   console.error(line)
 }

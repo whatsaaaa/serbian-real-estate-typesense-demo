@@ -157,8 +157,6 @@ export const locations: Location[] = [
   { name: 'Novo naselje', field: 'neighbourhood', locative: 'Novom naselju', parent: 'Novi Sad' },
 ]
 
-export const neighbourhoods = locations.filter((location) => location.field === 'neighbourhood')
-
 /** The place a name is, by its canonical name. */
 export function locationNamed(name: string): Location {
   const location = locations.find((candidate) => candidate.name === name)

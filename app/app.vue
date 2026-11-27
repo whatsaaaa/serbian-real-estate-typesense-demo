@@ -2,7 +2,7 @@
 const examples = [
   'trosoban stan na dorcolu',
   'гарсоњера на Звездари',
-  'dvoiposoban stan na Vračaru do 200k',
+  'dvoiposoban stan na Vračaru do 250k',
   'kuća u Zemunu sa garažom',
   'stan u bloku 45 sa terasom i liftom',
 ]

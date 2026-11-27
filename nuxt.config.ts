@@ -39,7 +39,10 @@ export default defineNuxtConfig({
     },
   },
   typescript: {
-    // Type-checks the root configs too, and the scripts and the Typesense configuration they use
-    nodeTsConfig: { include: ['../*.config.ts', '../scripts/**/*.ts', '../typesense/**/*.ts'] },
+    // Type-checks the root configs too, the scripts and the Typesense configuration they use, and
+    // the tests
+    nodeTsConfig: {
+      include: ['../*.config.ts', '../scripts/**/*.ts', '../typesense/**/*.ts', '../test/**/*.ts'],
+    },
   },
 })

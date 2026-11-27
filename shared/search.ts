@@ -19,7 +19,8 @@ export interface SearchResult {
 
 /**
  * The conditions of a filter_by, as Typesense joins them with &&. An && inside parentheses,
- * brackets or backticks belongs to the condition around it.
+ * brackets or backticks belongs to the condition around it. A filter with an || outside them is
+ * one condition, as Typesense runs a && b || c as (a && b) || c.
  */
 export function splitFilter(filterBy: string): string[] {
   const conditions: string[] = []
@@ -31,6 +32,7 @@ export function splitFilter(filterBy: string): string[] {
     if (char === '`') quoted = !quoted
     else if (!quoted && (char === '(' || char === '[')) depth++
     else if (!quoted && (char === ')' || char === ']')) depth--
+    else if (!quoted && depth === 0 && filterBy.startsWith('||', i)) return [filterBy.trim()]
     else if (!quoted && depth === 0 && filterBy.startsWith('&&', i)) {
       conditions.push(filterBy.slice(start, i))
       start = i + 2

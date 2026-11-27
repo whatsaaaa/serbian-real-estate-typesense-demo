@@ -51,7 +51,3 @@ export const roomWords: Record<number, string> = {
   4.5: 'četvoroiposoban',
   5: 'petosoban',
 }
-
-export const roomCounts = Object.keys(roomWords)
-  .map(Number)
-  .toSorted((a, b) => a - b)

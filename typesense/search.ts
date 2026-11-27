@@ -32,9 +32,10 @@ export class NotUnderstoodError extends Error {
 /** Typesense cannot run the parameters the natural language search generated. */
 export class UnrunnableParamsError extends Error {
   override name = 'UnrunnableParamsError'
-  readonly understood: Understood
+  /** What the search understood, when Typesense answered with it. */
+  readonly understood: Understood | undefined
 
-  constructor(understood: Understood, message: string) {
+  constructor(understood: Understood | undefined, message: string) {
     super(message)
     this.understood = understood
   }
@@ -44,7 +45,7 @@ export class UnrunnableParamsError extends Error {
  * Asks Typesense's natural language search what a query means: Typesense sends it to the LLM
  * with the system prompt and the schema, and answers with the parameters the LLM generated.
  */
-export async function understand(
+async function understand(
   client: Client,
   query: string,
 ): Promise<{ understood: Understood; parseTimeMs: number }> {
@@ -109,14 +110,16 @@ export async function searchListings(client: Client, query: string): Promise<Sea
   if (!trimmed)
     return { understood: null, parseTimeMs: null, ...(await fetchAll(client, { q: '*' })) }
 
-  const { understood, parseTimeMs } = await understand(client, trimmed)
+  let understood: Understood | undefined
   try {
+    const parsed = await understand(client, trimmed)
+    understood = parsed.understood
     const results = await fetchAll(client, {
       q: understood.q,
       filter_by: understood.filter_by,
       sort_by: understood.sort_by,
     })
-    return { understood, parseTimeMs, ...results }
+    return { understood, parseTimeMs: parsed.parseTimeMs, ...results }
   } catch (error) {
     // The LLM wrote a filter or a sort that is not valid, such as one on a field there is not
     if (error instanceof Errors.RequestMalformed) {
