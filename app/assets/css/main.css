@@ -1,0 +1,72 @@
+@import '@whatsaaaa/ui-vue/index.css';
+
+/*
+ * The window: on a wide screen it fills the screen and its content scrolls inside it, on a
+ * phone it grows with the content and the page scrolls.
+ */
+body {
+  min-height: 100dvh;
+  padding: var(--ws-space-20);
+}
+
+.window {
+  height: calc(100dvh - 2 * var(--ws-space-20));
+  max-width: var(--ws-size-frame);
+  margin-inline: auto;
+}
+
+.window-main {
+  position: relative;
+  min-height: 0;
+  overflow: auto;
+}
+
+.query-row {
+  display: grid;
+  grid-template: 'input button' 'help help' / minmax(0, 1fr) auto;
+  gap: var(--ws-space-6) var(--ws-space-12);
+}
+
+.query-row-input {
+  grid-area: input;
+}
+
+.query-row-button {
+  grid-area: button;
+  justify-content: center;
+}
+
+.query-row-help {
+  grid-area: help;
+}
+
+@media (width < 40rem) {
+  .query-row {
+    grid-template: 'input' 'help' 'button' / minmax(0, 1fr);
+  }
+
+  .query-row-button {
+    margin-top: var(--ws-space-10);
+  }
+}
+
+.results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: var(--ws-space-16);
+}
+
+@media (width < 64rem) {
+  body {
+    padding: var(--ws-space-12);
+  }
+
+  .window {
+    height: auto;
+    min-height: calc(100dvh - 2 * var(--ws-space-12));
+  }
+
+  .window-main {
+    overflow: visible;
+  }
+}

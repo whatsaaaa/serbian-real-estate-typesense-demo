@@ -1,0 +1,21 @@
+# Typesense for the demo, on http://localhost:8108. Its admin key comes from .env.
+#
+#   docker compose up -d     starts it
+#   docker compose down      stops it; the volume keeps the data and the model
+# The project's name keeps its volume's name the same whatever the folder is called
+name: serbian-real-estate-typesense-demo
+
+services:
+  typesense:
+    image: typesense/typesense:30.2
+    container_name: sre-demo-typesense
+    environment:
+      TYPESENSE_API_KEY: ${TYPESENSE_API_KEY:?Set TYPESENSE_API_KEY in .env}
+      TYPESENSE_DATA_DIR: /data
+    ports:
+      - '8108:8108'
+    volumes:
+      - typesense-data:/data
+
+volumes:
+  typesense-data:
