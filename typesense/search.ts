@@ -62,7 +62,7 @@ async function understand(
         query_by: queryBy,
         nl_query: true,
         nl_model_id: nlModelId,
-        // Only the parameters are wanted from this request: search() runs them
+        // Only the parameters are wanted from this request: searchListings() runs them
         per_page: 0,
       },
     ],
