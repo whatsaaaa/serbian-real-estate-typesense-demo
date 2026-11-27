@@ -57,9 +57,10 @@ async function understand(
     // Only the parameters are wanted from this request: search() runs them
     per_page: 0,
   })
-  // On a failure Typesense still searches, for the query as text, and says why in `error`
-  const { error } = response as { error?: string }
   const parsed = response.parsed_nl_query
+  // On a failure Typesense still searches, for the query as text, and says why in
+  // `parsed_nl_query.error`
+  const error = (parsed as { error?: string } | undefined)?.error
   if (error || !parsed) throw new NotUnderstoodError(error ?? 'Typesense returned no parameters')
 
   const generated = parsed.generated_params
