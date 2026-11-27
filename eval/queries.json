@@ -1,0 +1,115 @@
+[
+  {
+    "query": "trosoban stan na dorcolu",
+    "filter_by": "property_type:=`stan` && rooms:=3 && neighbourhood:=`Dorćol`"
+  },
+  {
+    "query": "Trosoban stan na Dorćolu",
+    "filter_by": "property_type:=`stan` && rooms:=3 && neighbourhood:=`Dorćol`"
+  },
+  {
+    "query": "трособан стан на Дорћолу",
+    "filter_by": "property_type:=`stan` && rooms:=3 && neighbourhood:=`Dorćol`"
+  },
+  {
+    "query": "dvoiposoban stan na Vračaru",
+    "filter_by": "property_type:=`stan` && rooms:=2.5 && district:=`Vračar`"
+  },
+  {
+    "query": "garsonjera na Zvezdari",
+    "filter_by": "property_type:=`stan` && rooms:=0.5 && district:=`Zvezdara`"
+  },
+  {
+    "query": "гарсоњера на Звездари",
+    "filter_by": "property_type:=`stan` && rooms:=0.5 && district:=`Zvezdara`"
+  },
+  {
+    "query": "kuća u Zemunu",
+    "filter_by": "property_type:=`kuća` && district:=`Zemun`"
+  },
+  {
+    "query": "kuca u zarkovu",
+    "filter_by": "property_type:=`kuća` && neighbourhood:=`Žarkovo`"
+  },
+  {
+    "query": "stan na Novom Beogradu do 150.000 evra",
+    "filter_by": "property_type:=`stan` && district:=`Novi Beograd` && price_eur:<=150000"
+  },
+  {
+    "query": "dvosoban stan u bloku 45",
+    "filter_by": "property_type:=`stan` && rooms:=2 && neighbourhood:=`Blok 45`"
+  },
+  {
+    "query": "jednoiposoban stan na Banovom brdu sa terasom",
+    "filter_by": "property_type:=`stan` && rooms:=1.5 && neighbourhood:=`Banovo brdo` && has_terrace:=true"
+  },
+  {
+    "query": "stan na Karaburmi sa liftom i parkingom",
+    "filter_by": "property_type:=`stan` && neighbourhood:=`Karaburma` && has_lift:=true && has_parking:=true"
+  },
+  {
+    "query": "uknjižen četvorosoban stan na Vozdovcu",
+    "filter_by": "property_type:=`stan` && rooms:=4 && district:=`Voždovac` && is_registered:=true"
+  },
+  {
+    "query": "najmanje trosoban stan na Limanu",
+    "filter_by": "property_type:=`stan` && rooms:>=3 && neighbourhood:=`Liman`"
+  },
+  {
+    "query": "stan u Novom Sadu ispod 100 hiljada evra",
+    "filter_by": "property_type:=`stan` && city:=`Novi Sad` && price_eur:<100000"
+  },
+  {
+    "query": "stan preko 80 kvadrata na Senjaku",
+    "filter_by": "property_type:=`stan` && neighbourhood:=`Senjak` && area_m2:>80"
+  },
+  {
+    "query": "dvosoban stan na Banjici, ne u prizemlju",
+    "filter_by": "property_type:=`stan` && rooms:=2 && neighbourhood:=`Banjica` && floor:>0"
+  },
+  {
+    "query": "stan sa centralnim grejanjem na Bežanijskoj kosi",
+    "filter_by": "property_type:=`stan` && neighbourhood:=`Bežanijska kosa` && heating:=`centralno`"
+  },
+  {
+    "query": "kuća na Dedinju sa garažom",
+    "filter_by": "property_type:=`kuća` && neighbourhood:=`Dedinje` && has_parking:=true"
+  },
+  {
+    "query": "troiposoban stan na Crvenom krstu ili Neimaru",
+    "filter_by": "property_type:=`stan` && rooms:=3.5 && neighbourhood:=[`Crveni krst`,`Neimar`]"
+  },
+  {
+    "query": "najjeftiniji stan u Mirijevu",
+    "filter_by": "property_type:=`stan` && neighbourhood:=`Mirijevo`",
+    "sort_by": "price_eur:asc"
+  },
+  {
+    "query": "stan na Grbavici sa etažnim grejanjem",
+    "filter_by": "property_type:=`stan` && neighbourhood:=`Grbavica` && heating:=`etažno`"
+  },
+  {
+    "query": "petosoban stan u Beogradu",
+    "filter_by": "property_type:=`stan` && rooms:=5 && city:=`Beograd`"
+  },
+  {
+    "query": "stan na Djeramu do drugog sprata",
+    "filter_by": "property_type:=`stan` && neighbourhood:=`Đeram` && floor:<=2"
+  },
+  {
+    "query": "dvosoban stan u Zemun polju",
+    "filter_by": "property_type:=`stan` && rooms:=2 && neighbourhood:=`Zemun polje`"
+  },
+  {
+    "query": "двособан стан на Новом Београду са терасом",
+    "filter_by": "property_type:=`stan` && rooms:=2 && district:=`Novi Beograd` && has_terrace:=true"
+  },
+  {
+    "query": "stan od 50 do 70 kvadrata na Fontani",
+    "filter_by": "property_type:=`stan` && neighbourhood:=`Fontana` && area_m2:[50..70]"
+  },
+  {
+    "query": "Dvoiposoban stan, Vračar, uknjižen, do 220k",
+    "filter_by": "property_type:=`stan` && rooms:=2.5 && district:=`Vračar` && is_registered:=true && price_eur:<=220000"
+  }
+]
